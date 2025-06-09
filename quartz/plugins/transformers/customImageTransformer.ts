@@ -22,7 +22,7 @@ export const customImageTransformer: QuartzTransformerPlugin = () => {
                             }
 
                             node.type = "html"
-                            node.value = `<img src="${node.url}" alt="" style="${style}" /><div style="clear: both;"></div>`
+                            node.value = `<div style="overflow: auto;"><img src="${node.url}" alt="" style="${style}" /></div>`
                         }
                     })
                 },
