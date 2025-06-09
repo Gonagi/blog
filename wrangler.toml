@@ -1,6 +1,0 @@
-name = "blog"
-type = "javascript"  # 없어도 됨
-compatibility_date = "2025-06-09"
-
-[site]
-bucket = "./public"
