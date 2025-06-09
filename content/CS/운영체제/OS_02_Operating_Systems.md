@@ -1,7 +1,7 @@
 # Advanced Intelligent Computing Architecture
 ## Hand-operated System
 ### 1950년대 초반
-- ==기계적인 스위치==를 이용해 1bit 단위로 컴퓨터에 입력되어 실행
+- ==기계적인 스위치==를 이용해 1bit 단위로 컴퓨터에 입력되어 실행  
   ![left|300](https://i.imgur.com/FJxwox4.png)
 ### 1950년대 중반
 - 모든 프로그램은 ==기계어로 쓰여짐==
