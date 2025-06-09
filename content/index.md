@@ -1,3 +1,6 @@
+---
+title: Gonagi
+---
 # CS
 - ## 운영체제
 	- [[OS_01_Introduction]]
