@@ -1,6 +1,3 @@
----
-dg-publish: true
----
 # Contents
 - ## 문제 상황
 - ## 해결 방법: Spring Cache 적용

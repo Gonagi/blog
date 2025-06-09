@@ -1,6 +1,3 @@
----
-dg-publish: true
----
 # Contents
 ## 1. Swagger 도입
 ## 2. 커스텀 어노테이션을 통한 중복 제거 시도

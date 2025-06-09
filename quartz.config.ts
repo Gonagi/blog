@@ -1,3 +1,4 @@
+import { customImageTransformer } from "./quartz/plugins/transformers/customImageTransformer"
 import { QuartzConfig } from "./quartz/cfg"
 import * as Plugin from "./quartz/plugins"
 
@@ -14,7 +15,7 @@ const config: QuartzConfig = {
     enablePopovers: true,
     analytics: {
       provider: "google",
-	  tagId: "G-P876DL2PLW",
+      tagId: "G-P876DL2PLW",
     },
     locale: "ko-KR",
     baseUrl: "gonagi.pages.dev",
@@ -56,6 +57,7 @@ const config: QuartzConfig = {
   },
   plugins: {
     transformers: [
+      customImageTransformer(),
       Plugin.FrontMatter(),
       Plugin.CreatedModifiedDate({
         priority: ["frontmatter", "git", "filesystem"],
