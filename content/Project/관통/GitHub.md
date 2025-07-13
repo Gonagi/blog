@@ -194,7 +194,7 @@ git commit -m "feat(1): 1번 기능 파일 작성"
 # 브랜치 푸시 (원격 저장소에 feature/1 브랜치 업로드)
 git push -u origin feature/1
 ```
-### 4.3.2. feature/2
+### 4.3.2. `feature/2`
 ``` cmd
 git checkout main
 
@@ -249,17 +249,17 @@ git push -u origin feature/3
 	- `git pull origin main`
 ### 4.5.2. 결과
 ![](https://i.imgur.com/2BbuTnr.png)
-## 4.5. 작업중인 브랜치로 `main` 변경 사항 병합하기
+## 4.6. 작업중인 브랜치로 `main` 변경 사항 병합하기
 > main 브랜치에 누군가 PR을 병합했을 때, 
 > 내 작업 브랜치(`feature/2`, `feature/3` 등)에도 **최신 변경 사항을 반영**한다.
-### 4.5.1. 병합 방법
+### 4.6.1. 병합 방법
 ![](https://i.imgur.com/GhKMULR.png)
 
 | 방법       | 설명                          | 히스토리 정리                   | 충돌 위험    | 권장 시점                                       |
 | -------- | --------------------------- | ------------------------- | -------- | ------------------------------------------- |
 | `merge`  | 브랜치 간 변경 사항을 합치는 방법         | 커밋 히스토리 유지됨 (merge 커밋 생김) | 낮음       | 공유 브랜치, 팀 협업 시                              |
 | `rebase` | 내 커밋을 최신 브랜치 위로 "올려서" 다시 작성 | 히스토리 깔끔                   | 충돌 위험 있음 | 혼자 쓰는 브랜치에서만 사용 (push 전 or force push 가능 시) |
-### 4.5.2. rebase 병합 예시
+### 4.6.2. rebase 병합 예시
 ``` cmd
 # feature/2 브랜치로 이동
 git checkout feature/2
@@ -277,7 +277,7 @@ git push --force-with-lease
 - `1.txt`, `2.txt` 둘 다 있는거 확인할 수 있음
 ![](https://i.imgur.com/gYLlOE1.png)
 ![](https://i.imgur.com/Tn1xXnw.png)
-### 4.5.3. `rebase` 병합 중 충돌 발생 예시
+### 4.6.3. `rebase` 병합 중 충돌 발생 예시
 ``` cmd
 # feature/3 브랜치로 이동
 git checkout feature/3
@@ -327,6 +327,12 @@ git push --force-with-lease
 ### 5.4. Rebase 사용 규칙
 -  **Rebase 사용 허용 범위**  
     → 개인 브랜치에서는 허용? 협업 브랜치에서는 금지? 모든 병합은 merge만 허용할지?
+### 5.5. Force Push 및 실수 복구 규칙
+- **Force Push 허용 범위를 정해야 함**  
+    → 개인 브랜치에서는 `--force-with-lease` 사용을 허용할지 여부  
+    → 협업 브랜치(main, develop 등)에서는 Force Push를 허용할지, 금지할지 결정 필요
+- **잘못된 push 발생 시 복구 방식 정의 필요**  
+    → 실수로 잘못 push했을 경우 `git revert`, `reset`, `reflog` 중 어떤 방식으로 복구할지
 ---
 # 출처
 - [broccoli (24.10.11) 개발 현장의 Git Flow: 시나리오별 문제 해결로 협업 능력 향상하기](https://devocean.sk.com/blog/techBoardDetail.do?ID=166878&boardType=techBlog)
