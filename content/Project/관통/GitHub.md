@@ -58,14 +58,14 @@
 	- `release`: 다음 출시 버전을 준비하는 브랜치
 	- `hotfix`: 출시된 제품의 버그를 고치기 위한 브랜치
 - ##### 흐름
-1. 기능 개발
- - `develop` 브랜치에서 `feature/*` 브랜치 생성 →  기능 개발 후 **Pull Request(PR)** 를 통해 리뷰 → `develop`에 병합
-2. 릴리스 준비
- - `develop`에서 `release/*` 브랜치 생성 → 배포 전 테스트 및 버그 수정
-3. 배포
- - `release` 브랜치를 `main`(또는 `master`)에 병합 → 제품 출시
-4. 긴급 수정  
- - 배포 후 발생한 문제는 `main`에서 `hotfix/*` 브랜치를 만들어 해결 → `main`과 `develop`에 병합
+	1. 기능 개발
+	 - `develop` 브랜치에서 `feature/*` 브랜치 생성 →  기능 개발 후 **Pull Request(PR)** 를 통해 리뷰 → `develop`에 병합
+	2. 릴리스 준비
+	 - `develop`에서 `release/*` 브랜치 생성 → 배포 전 테스트 및 버그 수정
+	3. 배포
+	 - `release` 브랜치를 `main`(또는 `master`)에 병합 → 제품 출시
+	4. 긴급 수정  
+	 - 배포 후 발생한 문제는 `main`에서 `hotfix/*` 브랜치를 만들어 해결 → `main`과 `develop`에 병합
 ### 2.2.2. Github-flow
 ![](https://i.imgur.com/oyKRRfY.png)
 - ##### 브랜치 종류
