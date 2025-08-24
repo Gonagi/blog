@@ -50,8 +50,11 @@ title: Gonagi
 - ## TripMate
 	- [[관광지 페이지네이션 성능 최적화(캐시 미적용 vs Ehcache vs Redis)]]
 	- [[Swagger 문서화 개선기]]
-- ## 관통
+- ## Eatda
 	- [[GitHub]]
+	- ### 프로젝트 진행중 겪은 문제
+		- [[Redis Streams 도입기]]
+		- [[리뷰 생성 기능 성능 최적화 - CPU 병목 해소와 비동기 처리 도입]]
 ---
 # Docker
 - [[Docker를 사용하는 이유]]
