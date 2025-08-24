@@ -132,6 +132,7 @@ Message queue는 **Producer(발행자)와 Consumer(구독자)** 를 분리하여
 	- 메뉴 포스터: 3분
 	- 이벤트 에셋: 3분
 	- OCR 요청: 3분
+
 ![리뷰 TTL & expireAt 예시](https://i.imgur.com/dXeD5P9.png)
 - 리뷰 메시지에 적용한 `expireAt`
 
@@ -143,6 +144,7 @@ Message queue는 **Producer(발행자)와 Consumer(구독자)** 를 분리하여
 	- 메뉴 포스타: 1000개
 	- 이벤트 에셋: 1000개
 	- OCR 요청: 500개
+
 ![리뷰 MAXLEN 예시](https://i.imgur.com/I8Ad2cI.png)
 - 아래는 리뷰 메시지에 적용된 `MAXLEN`
 
@@ -211,7 +213,9 @@ var json = new GenericJackson2JsonRedisSerializer(objectMapper); template.setVal
 - Spring Batch + Scheduler를 이용해 **20분마다 스트림 청소 Job**을 자동 실행.
 - Cleaner 로그를 통해 `"삭제된 메시지 개수"`, `"누락된 expireAt"`, `"파싱 오류"` 등을 추적 가능하게 했습니다.
 - 운영 중 장애 상황이 발생해도 로그를 기반으로 쉽게 원인을 파악할 수 있도록 설계했습니다.
+
 ![Spring Batch Redis Streams](https://i.imgur.com/dIgwJsp.png)
+
 ---
 ## 4.3. RedisStreamPublisher: 안정적인 발행 모듈
 
