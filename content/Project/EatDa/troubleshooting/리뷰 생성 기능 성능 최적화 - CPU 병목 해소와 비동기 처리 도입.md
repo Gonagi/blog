@@ -113,7 +113,7 @@ sleep(0.1); // 0.1초 대기
 ![](https://i.imgur.com/suHHKJc.png)
 - gunicorn 워커 4개가 각각 CPU 100% 점유
 - 스레드 수는 Spring, FastAPI, Redis 등 모든 프로세스를 포함
-- 결국 **테스트 중 ==EC2 다운 발생**==
+- 결국 테스트 중 **==EC2 다운 발생==**
 ---
 ## 3.5. 결론
 - 응답 시간만 보면 짧아 보이지만, 실제로는 **Dropped Iterations가 급증**
@@ -204,7 +204,7 @@ private List<String> uploadImages(final List<MultipartFile> images,
 ```
 - 업로드를 **백그라운드 작업**으로 분리 → **HTTP 요청 스레드는 즉시 반환**
 - 업로드 완료 후 **Redis 메시지 발행**을 체이닝 → 처리 흐름 유지
-- 동시 업로드는 **전용 `executor`**로 처리 → 처리량 안정화
+- 동시 업로드는 **전용 `executor`** 로 처리 → 처리량 안정화
 ---
 ## 5.3. 개선 효과
 - **HTTP 요청 스레드가 이미지 업로드 완료를 기다리지 않음**  
@@ -215,9 +215,9 @@ private List<String> uploadImages(final List<MultipartFile> images,
 ## 5.4. k6 & Grafana 테스트 결과
 ### 5.4.1. k6
 ![](https://i.imgur.com/zZc5Jt4.png)
-    - dropped Iterations = **0**
-    - 모든 요청이 정상 처리됨
-    - 평균 응답 시간도 크게 감소
+- dropped Iterations = **0**
+- 모든 요청이 정상 처리됨
+- 평균 응답 시간도 크게 감소
 ---
 ### 5.4.2. Grafana
 #### 처리량(Throughput)
@@ -226,21 +226,21 @@ private List<String> uploadImages(final List<MultipartFile> images,
 - Dropped Iterations 없이 **모든 요청을 정상적으로 처리**
 - 개선 전에는 CPU 포화로 그래프가 끊기거나 급격히 하락했지만,  
     개선 후에는 **안정적으로 처리량을 유지**
-
+---
 #### Redis Streams 발행 성공률
 ![](https://i.imgur.com/9WYJvvF.png)
 - **Success 지표(녹색)** 가 꾸준히 증가
 - **Failure 지표(주황색)** 는 0 → 메시지 유실 없음
 - 개선 전에는 서버 다운으로 발행 실패 가능성이 있었으나,  
     개선 후에는 **모든 요청이 안정적으로 Redis Streams에 기록
-    
+---
 #### CPU 사용률
 ![](https://i.imgur.com/qNUXrBI.png)
 - **App CPU / System CPU 사용률이 10~20% 수준** 으로 유지
 - 개선 전처럼 99~100%에 도달하지 않음
 - gunicorn 워커가 병렬 처리하더라도 CPU 리소스가 고르게 분배되어,  
     **코어별 100% 점유 현상이 사라짐**
-
+---
 ## 5.5. 리뷰 생성 기능 성능 개선 전/후 비교
 | 구분                   | 개선 전                                             | 개선 후                                     |
 | -------------------- | ------------------------------------------------ | ---------------------------------------- |
@@ -261,7 +261,7 @@ private List<String> uploadImages(final List<MultipartFile> images,
 - 이미지 업로드(`upload_images`, `background_upload`) 시간이 **0.5s → 0.01s 수준**으로 크게 감소
 
 ![](https://i.imgur.com/lfJiqqz.png)
-- CPU 사용률이 **10~20% → 2~4% 수준**으로 감소
+- CPU 사용률이 **10 ~ 20% → 2 ~ 4% 수준** 으로 감소
 
 ![](https://i.imgur.com/YujH0I5.png)
 - **http_req_duration(평균 응답 시간)**: 오히려 **증가** (**3.76s → 13.53s**)
@@ -274,7 +274,7 @@ private List<String> uploadImages(final List<MultipartFile> images,
 ## 6.3. 결론
 - CPU 사용량은 줄었지만, **응답 시간은 오히려 악화**
 - 이미지 최적화는 CPU를 많이 쓰더라도 **I/O를 줄여 총 처리 시간을 단축**
-- 따라서 프로젝트에서는 **이미지 최적화 로직(webp 변환/리사이징)을 유지**하기로 결정
+- 따라서 프로젝트에서는 ==**이미지 최적화 로직(webp 변환/리사이징)을 유지**하기로 결정==
 
 > CPU 부담을 줄인다고 무조건 빨라지지는 않는다.
 > 병목은 상대적이며, 한쪽을 줄이면 다른 곳이 새로운 한계로 드러난다.

@@ -27,7 +27,7 @@
 ---
 ## 1.3. 비동기 처리의 필요성
 
-단일 서버 환경에서 **AI 연산 요청(이미지/영상 생성)**은 CPU와 메모리를 많이 소모합니다.  
+단일 서버 환경에서 **AI 연산 요청(이미지/영상 생성)** 은 CPU와 메모리를 많이 소모합니다.  
 만약 이를 **동기 방식**으로 처리한다면, 사용자의 요청은 AI 연산이 끝날 때까지 대기해야 하며, 이는 곧 응답 지연과 서비스 품질 저하로 이어집니다.
 ![서버 내부의 비동기 처리](https://i.imgur.com/aF3zlzm.png)
 
@@ -40,7 +40,7 @@
     - 한 서비스에서 장애가 발생하면, 다른 서비스까지 연쇄적으로 영향을 받을 수 있습니다.
 
 > 즉, **서버 내부 비동기 처리만으로는 안정성과 확장성에 근본적인 한계가 있습니다.**  
-> 이 문제를 해결하기 위해, 요청을 안전하게 저장하고 분산 처리할 수 있는 **메시지 큐(Message Queue)가 필요합니다.
+> 이 문제를 해결하기 위해, 요청을 안전하게 저장하고 분산 처리할 수 있는 **메시지 큐(Message Queue)** 가 필요합니다.
 ---
 # 2. Message Queue 란?
 ## 2.1. Message Queue
@@ -126,35 +126,26 @@ Message queue는 **Producer(발행자)와 Consumer(구독자)** 를 분리하여
 ### 4.2.1. TTL(Time-To-Live) & 만료 메시지 정리
 - 메시지마다 **만료 시간(expireAt)** 을 설정하여 불필요한 메시지가 무한정 쌓이지 않도록 제한했습니다.
 - Spring Batch 기반의 **RedisStreamCleanerJob**을 주기적으로 실행하여 만료된 메시지를 자동 삭제합니다.
-- TTL은 도메인 특성에 맞게 분리했습니다:
-
-| 도메인    | TTL |
-| ------ | --- |
-| 리뷰 에셋  | 5분  |
-| 메뉴 포스터 | 3분  |
-| 이벤트 에셋 | 3분  |
-| OCR 요청 | 3분  |
-
 ![TTL 관리 구조도](https://i.imgur.com/PjJ4lbT.png)
-
-- 아래는 리뷰 메시지에서 `expireAt` 필드를 활용하는 예시입니다:
+- TTL은 도메인 특성에 맞게 분리했습니다:
+	- 리뷰 에셋: 5분
+	- 메뉴 포스터: 3분
+	- 이벤트 에셋: 3분
+	- OCR 요청: 3분
 ![리뷰 TTL & expireAt 예시](https://i.imgur.com/dXeD5P9.png)
+- 리뷰 메시지에 적용한 `expireAt`
+
 ---
 ### 4.2.2. MAXLEN 설정
 - 각 스트림마다 **최대 메시지 개수**를 제한하여 Redis 메모리 폭주를 방지했습니다.
 - Lua 스크립트를 이용해 `XADD MAXLEN ~` 옵션을 강제 적용하여 안정성을 확보했습니다.
-
-| 도메인 | MAXLEN |
-|--------|--------|
-| 리뷰 에셋 | 2000개 |
-| 메뉴 포스터 | 1000개 |
-| 이벤트 에셋 | 1000개 |
-| OCR 요청 | 500 ~ 1000개 |
-
-![MAXLEN 관리 구조도](https://i.imgur.com/SH2iGMM.png)
-
-- 아래는 리뷰 메시지에 적용된 MAXLEN 예시입니다:  
+	- 리뷰에셋: 2000갸
+	- 메뉴 포스타: 1000개
+	- 이벤트 에셋: 1000개
+	- OCR 요청: 500개
 ![리뷰 MAXLEN 예시](https://i.imgur.com/I8Ad2cI.png)
+- 아래는 리뷰 메시지에 적용된 `MAXLEN`
+
 ---
 ### 4.2.3. 재시도(Exponential Backoff) & DLQ
 
@@ -181,7 +172,7 @@ Message queue는 **Producer(발행자)와 Consumer(구독자)** 를 분리하여
 - Redis Streams는 **문자열 기반**으로 직렬화했으며, 복잡한 객체는 **JSON 직렬화**를 적용했습니다.
 - Instant/LocalDateTime 등 시간 타입은 **ISO-8601 포맷**으로 통일해 Consumer가 언어/환경과 무관하게 파싱 가능하도록 했습니다.
 #### 코드 (`RedisConfig`)
-1. **문자열 기반 직렬화 (Redis Streams 전용)**
+**문자열 기반 직렬화 (Redis Streams 전용)**
 ``` java
 @Bean(name = "redisStreamTemplate") 
 public RedisTemplate<String, String> redisStreamTemplate(RedisConnectionFactory factory) {     
@@ -198,14 +189,14 @@ public RedisTemplate<String, String> redisStreamTemplate(RedisConnectionFactory 
 }
 ```
 - Redis Streams는 **키/값 모두 String 직렬화**를 강제해서 언어 간 호환성을 확보.
-    
-2. **JSON 직렬화 (일반 RedisTemplate)**
+
+**JSON 직렬화 (일반 RedisTemplate)**
 ``` java
 var json = new GenericJackson2JsonRedisSerializer(objectMapper); template.setValueSerializer(json); template.setHashValueSerializer(json);
 ```
 - 복잡한 객체는 `GenericJackson2JsonRedisSerializer`로 JSON 변환.
-    
-3. **시간 타입 ISO-8601 직렬화**    
+
+**시간 타입 ISO-8601 직렬화**    
 ``` java
 @Bean public ObjectMapper objectMapper() {     
 	return new ObjectMapper()
