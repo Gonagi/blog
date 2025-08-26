@@ -46,8 +46,8 @@ export const options = {
 		    rate: __ENV.RATE,                  // 요청 발생 빈도
 		    timeUnit: __ENV.TIME_UNIT,         // 기준 단위 시간
 		    duration: __ENV.DURATION,          // 전체 테스트 실행 시간
-			preAllocatedVUs: __ENV.PRE_VUS,    // 미리 확보할 가상 사용자 수
-			maxVUs: __ENV.MAX_VUS,             // 최대 동시 실행 가능한 가상 사용자 수
+		    preAllocatedVUs: __ENV.PRE_VUS,    // 미리 확보할 가상 사용자 수
+		    maxVUs: __ENV.MAX_VUS,             // 최대 동시 실행 가능한 가상 사용자 수
         },
     },
 };
