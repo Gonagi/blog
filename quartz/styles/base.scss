@@ -23,11 +23,11 @@ body {
   background-color: var(--textHighlight);
   padding: 0 0.1rem;
   border-radius: 5px;
-  color: var(--dark);
+  color: var(--light);
 }
 ::selection {
   background: color-mix(in srgb, var(--tertiary) 60%, rgba(255, 255, 255, 0));
-  color: var(--dark);
+  color: var(--light);
 }
 
 p,
@@ -472,7 +472,7 @@ pre {
     & [data-highlighted-chars] {
       background-color: var(--highlight);
       border-radius: 5px;
-      color: var(--dark);
+      color: var(--light);
     }
 
     & > [data-line] {
