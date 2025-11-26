@@ -1,6 +1,86 @@
 ---
 title: Gonagi
 ---
+# 프로젝트
+
+> [!example] LogLens
+> <details>
+> <summary>목차 보기</summary>
+>
+> ### 백엔드 라이브러리
+> - [[목차]]
+> - [[1. 전체 구조 개요]]
+> - [[2. TraceID 관리 시스템]]
+> - [[3. 의존성 정보 수집 메커니즘]]
+> - [[4. 자동 로깅 시스템]]
+> - [[5. 자동 설정 및 통합]]
+> - [[6. 전체 실행 흐름]]
+> - [[7. 핵심 기술]]
+> - [[8. 사용자 가이드]]
+>
+> ### 인프라
+> - [[인프라 아키텍처]]
+>
+> </details>
+
+
+> [!example] Eatda
+> <details>
+> <summary>목차 보기</summary>
+>
+> - [[GitHub]]
+> - [[Redis Streams 도입기]]
+> - [[리뷰 생성 기능 성능 최적화 - CPU 병목 해소와 비동기 처리 도입]]
+> - [[로그 설계 및 기준 정립 과정]]
+>
+> </details>
+
+
+> [!example] TripMate
+> <details>
+> <summary>목차 보기</summary>
+>
+> - [[관광지 페이지네이션 성능 최적화(캐시 미적용 vs Ehcache vs Redis)]]
+> - [[Swagger 문서화 개선기]]
+>
+> </details>
+
+
+> [!example] 뽀송길
+> <details>
+> <summary>목차 보기</summary>
+>
+> ### 개요
+> - [[content/Project/뽀송길/outline/1_프로젝트_소개]]
+> - [[2_초단기예보_초단기실황]]
+> - [[3_대중교통_경로]]
+> - [[4_OSRM]]
+> - [[5_결과]]
+>
+> ### 프로젝트 진행중 겪은 문제
+> - [[Docker_Springboot_환경설정_개선기]]
+> - [[최단경로탐색_알고리즘]]
+> - [[서울시_지리공간_데이터_만들기]]
+> - [[OSRM_실행과정_일대기]]
+> - [[뽀송_가중치_설정_과정]]
+> - [[Promise_all을_이용한_기상_데이터_수집_개선기]]
+>
+> ### 산출물
+> - [뽀송길_프로젝트_보고서](https://drive.google.com/file/d/1wrz1E6c7A9nHXzTyQL8pcUO7h0W5dfZO/view?usp=sharing)
+> - [뽀송길_경진대회_보고서](https://drive.google.com/file/d/1k3UiB7mK23dokLBPTBnj6_33Zd_6Vqqt/view?usp=sharing)
+> - [[발표자료]]
+> - [시연영상](https://youtu.be/pW2QbOUD66s)
+> - [GitHub 주소](https://github.com/Gonagi/pposonggil_v2)
+>
+> ### 특허
+> - [뽀송길_발명신고서](https://drive.google.com/file/d/1_fZTv2taQnOpr-6V0mWEHvOHQl5bnMbx/view?usp=sharing)
+> - [뽀송길_출원명세서_검토_의뢰서](https://drive.google.com/file/d/1zlzwJs632xbQXTzPHBOILQp1A8I4aWoL/view?usp=drive_link)
+> - [해외 출원 기술설명서](https://docs.google.com/presentation/d/1XoxPb5tSyJI2GB6fRGezKFaXICcB3cYN/edit?usp=sharing&ouid=111875955541227552351&rtpof=true&sd=true)
+>
+> </details>
+
+---
+
 # CS
 
 > [!note] 운영체제
@@ -37,83 +117,6 @@ title: Gonagi
 >
 > - [[참조자(Reference)]]
 > - [[Paging]]
->
-> </details>
-
----
-
-# 프로젝트
-
-> [!example] 뽀송길
-> <details>
-> <summary>목차 보기</summary>
->
-> ### 개요
-> - [[content/Project/뽀송길/outline/1_프로젝트_소개]]
-> - [[2_초단기예보_초단기실황]]
-> - [[3_대중교통_경로]]
-> - [[4_OSRM]]
-> - [[5_결과]]
->
-> ### 프로젝트 진행중 겪은 문제
-> - [[Docker_Springboot_환경설정_개선기]]
-> - [[최단경로탐색_알고리즘]]
-> - [[서울시_지리공간_데이터_만들기]]
-> - [[OSRM_실행과정_일대기]]
-> - [[뽀송_가중치_설정_과정]]
-> - [[Promise_all을_이용한_기상_데이터_수집_개선기]]
->
-> ### 산출물
-> - [뽀송길_프로젝트_보고서](https://drive.google.com/file/d/1wrz1E6c7A9nHXzTyQL8pcUO7h0W5dfZO/view?usp=sharing)
-> - [뽀송길_경진대회_보고서](https://drive.google.com/file/d/1k3UiB7mK23dokLBPTBnj6_33Zd_6Vqqt/view?usp=sharing)
-> - [[발표자료]]
-> - [시연영상](https://youtu.be/pW2QbOUD66s)
-> - [GitHub 주소](https://github.com/Gonagi/pposonggil_v2)
->
-> ### 특허
-> - [뽀송길_발명신고서](https://drive.google.com/file/d/1_fZTv2taQnOpr-6V0mWEHvOHQl5bnMbx/view?usp=sharing)
-> - [뽀송길_출원명세서_검토_의뢰서](https://drive.google.com/file/d/1zlzwJs632xbQXTzPHBOILQp1A8I4aWoL/view?usp=drive_link)
-> - [해외 출원 기술설명서](https://docs.google.com/presentation/d/1XoxPb5tSyJI2GB6fRGezKFaXICcB3cYN/edit?usp=sharing&ouid=111875955541227552351&rtpof=true&sd=true)
->
-> </details>
-
-> [!example] TripMate
-> <details>
-> <summary>목차 보기</summary>
->
-> - [[관광지 페이지네이션 성능 최적화(캐시 미적용 vs Ehcache vs Redis)]]
-> - [[Swagger 문서화 개선기]]
->
-> </details>
-
-> [!example] Eatda
-> <details>
-> <summary>목차 보기</summary>
->
-> - [[GitHub]]
-> - [[Redis Streams 도입기]]
-> - [[리뷰 생성 기능 성능 최적화 - CPU 병목 해소와 비동기 처리 도입]]
-> - [[로그 설계 및 기준 정립 과정]]
->
-> </details>
-
-> [!example] LogLens
-> <details>
-> <summary>목차 보기</summary>
->
-> ### 백엔드 라이브러리
-> - [[목차]]
-> - [[1. 전체 구조 개요]]
-> - [[2. TraceID 관리 시스템]]
-> - [[3. 의존성 정보 수집 메커니즘]]
-> - [[4. 자동 로깅 시스템]]
-> - [[5. 자동 설정 및 통합]]
-> - [[6. 전체 실행 흐름]]
-> - [[7. 핵심 기술]]
-> - [[8. 사용자 가이드]]
->
-> ### 인프라
-> - [[인프라 아키텍처]]
 >
 > </details>
 
