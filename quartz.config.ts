@@ -67,7 +67,7 @@ const config: QuartzConfig = {
           light: "github-dark",
           dark: "github-dark",
         },
-        keepBackground: true,
+        keepBackground:,
       }),
       Plugin.ObsidianFlavoredMarkdown({ enableInHtmlEmbed: false }),
       Plugin.GitHubFlavoredMarkdown(),
@@ -75,6 +75,9 @@ const config: QuartzConfig = {
       Plugin.CrawlLinks({ markdownLinkResolution: "shortest" }),
       Plugin.Description(),
       Plugin.Latex({ renderEngine: "katex" }),
+	  Plugin.PrettyCode({
+	    defaultLang: "plaintext",  // 언어 없는 코드도 하이라이팅
+      }),
     ],
     filters: [Plugin.RemoveDrafts()],
     emitters: [
