@@ -24,6 +24,14 @@ title: Gonagi
 > 	- [[2. 고객 서버 영역]]
 > 	- [[3. AI 서버 영역]]
 > 	- [[4. 로그 처리 흐름]]
+> - [[Bastion을 통한 Private 서버 SSH 접속 가이드]]
+> 
+> ### 트러블슈팅
+> - [[Logstash log_id 중복 생성 문제]]
+> - [[OpenSearch 인덱스 설계 개선 - 프로젝트 단위 인덱싱 구조로 전환하기]]
+> - [[OpenSearch TraceID 검색 실패 원인 분석 및 해결]]
+> - [[EC2 볼륨 확장이 적용되지 않는 문제]]
+> - [[Redis 연결 오류]]
 > </details>
 
 
