@@ -643,3 +643,37 @@ iframe.pdf {
   transition: width 0.2s ease;
   z-index: 9999;
 }
+
+/* ========================================= */
+/* One Dark Code Block Theme (Override) */
+/* ========================================= */
+
+/* 코드블록 전체 배경 & 테두리 */
+pre {
+  background-color: #282c34 !important;  /* One Dark Background */
+  border-color: #3a3f4b !important;
+  color: #abb2bf !important;             /* Default text */
+}
+
+/* 코드 내부 */
+pre > code {
+  background: transparent !important;
+  color: #abb2bf !important;
+}
+
+/* 라인 넘버 색 */
+pre > code > [data-line]::before {
+  color: rgba(171, 178, 191, 0.4) !important;
+}
+
+/* 하이라이트 라인 */
+pre > code > [data-line][data-highlighted-line] {
+  background-color: rgba(97, 175, 239, 0.15) !important;  /* cyan highlight */
+  border-left-color: #61afef !important;
+}
+
+/* inline code (`내용`)도 어둡게 하고 싶으면 */
+code {
+  background-color: #3a3f4b !important;
+  color: #e2e8f0 !important;
+}
