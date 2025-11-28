@@ -2,27 +2,3 @@
 
 // put your custom CSS here!
 
-/* ========================================= */
-/* Force Dark-mode code style also in Light Mode */
-/* ========================================= */
-
-/* Quartz가 dark 모드에서 사용하는 코드 스타일을
-   light 모드에서도 똑같이 적용 */
-:root[color-scheme="light"] pre,
-:root[color-scheme="light"] pre > code,
-:root[color-scheme="light"] pre > code > [data-line] {
-  background-color: #282c34 !important;  /* dark mode code bg */
-  color: #abb2bf !important;             /* dark mode text color */
-}
-
-/* 라인 넘버 */
-:root[color-scheme="light"] pre > code > [data-line]::before {
-  color: rgba(171, 178, 191, 0.4) !important;
-}
-
-/* 하이라이트 라인 */
-:root[color-scheme="light"] pre > code > [data-line][data-highlighted-line] {
-  background-color: rgba(97, 175, 239, 0.15) !important;
-  border-left-color: #61afef !important;
-}
-
