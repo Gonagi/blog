@@ -1,7 +1,7 @@
 ## 1. 문제 상황
 ### 1.1 발생한 문제
 Trace ID 기반 로그 검색 시 OpenSearch에서 다음과 같은 오류가 발생했습니다.
-```
+``` text
 OpenSearchException: [search_phase_execution_exception] all shards failed
 ```
 
@@ -18,7 +18,7 @@ OpenSearchException: [search_phase_execution_exception] all shards failed
 - Logstash OSS 8.9.0
 
 **인덱스 구조**
-```
+``` text
 831776ac_2d47_3e23_83b9_7619972f0cbf_2025_11
 ```
 ---

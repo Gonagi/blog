@@ -7,7 +7,7 @@
 - **인증 방식**: SSH 키 (`loglens306.pem`)
 ---
 ### 1.2 접속 흐름
-```
+``` text
 로컬 PC → Bastion Host (bastion.loglens.co.kr) → Private Server (loglens-server.home)
 ```
 
@@ -154,7 +154,7 @@ ssh loglens-server
 ```
 
 **성공 시 출력**
-```
+``` shell
 Welcome to Ubuntu 22.04.3 LTS (GNU/Linux 5.15.0-1234-aws x86_64)
 
 ubuntu@loglens-server:~$
@@ -169,7 +169,7 @@ ssh -v loglens-server
 ```
 
 **출력 예시**
-```
+``` text
 debug1: Connecting to bastion.loglens.co.kr [x.x.x.x] port 22.
 debug1: Connection established.
 debug1: Entering interactive session.

@@ -16,7 +16,7 @@ lsblk
 ```
 
 ### 2.2 확인 결과
-```
+``` text
 Filesystem      Size  Used Avail Use% Mounted on
 /dev/root       6.8G  4.6G  2.2G  68% /
 
@@ -50,7 +50,7 @@ sudo growpart /dev/nvme0n1 1
 ```
 
 **실행 결과**
-```
+``` text
 CHANGED: partition=1 start=2099200 old: size=14677983 end=16777182 new: size=60815327 end=62914526
 ```
  `/dev/nvme0n1` 디스크의 1번 파티션(`/dev/nvme0n1p1`)이 디스크 전체 크기로 확장되었습니다.
@@ -62,7 +62,7 @@ sudo resize2fs /dev/nvme0n1p1
 ```
 
 **실행 결과**
-```
+``` text
 Filesystem at /dev/nvme0n1p1 is mounted on /; on-line resizing required
 old_desc_blocks = 1, new_desc_blocks = 4
 The filesystem on /dev/nvme0n1p1 is now 7601915 (4k) blocks long.
@@ -76,7 +76,7 @@ df -h
 ```
 
 **결과**
-```
+``` text
 Filesystem      Size  Used Avail Use% Mounted on
 /dev/root        30G  4.6G   25G  16% /
 ```

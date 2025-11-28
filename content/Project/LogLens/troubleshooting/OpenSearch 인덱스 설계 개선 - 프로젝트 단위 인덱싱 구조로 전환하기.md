@@ -16,7 +16,7 @@
 인덱스를 **프로젝트 단위로 분리**하여 `{PROJECT_UUID}-YYYY.MM` 형식으로 저장
 
 **예시**
-```
+``` text
 S13P31A306-2025.11 (프로젝트 A의 2025년 11월 로그)
 S13P21A111-2025.11 (프로젝트 B의 2025년 11월 로그)
 S13P31A306-2025.12 (프로젝트 A의 2025년 12월 로그)
@@ -33,7 +33,7 @@ S13P31A306-2025.12 (프로젝트 A의 2025년 12월 로그)
 - Spring Boot 3.x
 
 **데이터 흐름**
-```
+``` text
 Spring Boot → Fluent Bit → Kafka → Logstash → OpenSearch
 ```
 ---
@@ -82,12 +82,12 @@ public LogSearchResult findWithCursor(String projectUuid, LogSearchRequest reque
 ### 3.1 인덱스 네이밍 규칙 변경
 
 **새로운 규칙**
-```
+``` text
 {project_uuid}-%{+YYYY.MM}
 ```
 
 **예시**
-```
+``` text
 S13P31A306-2025.11 (프로젝트 S13P31A306의 2025년 11월 로그)
 S13P31A306-2025.12 (프로젝트 S13P31A306의 2025년 12월 로그)
 S13P21A111-2025.11 (프로젝트 S13P21A111의 2025년 11월 로그)
@@ -500,7 +500,7 @@ String indexPattern = OpenSearchUtils.getProjectIndexPattern(projectUuid);
 ---
 
 ## 8. 전체 데이터 흐름
-```
+``` text
 Spring Boot (로그 생성)
     ↓
 Fluent Bit

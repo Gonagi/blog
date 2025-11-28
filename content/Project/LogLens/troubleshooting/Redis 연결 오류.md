@@ -2,12 +2,12 @@
 ### 1.1 발생한 에러
 
 Spring Boot 애플리케이션에서 Redis 연결 시 다음과 같은 에러가 발생했습니다.
-```
+``` text
 org.springframework.data.redis.RedisConnectionFailureException: Unable to connect to Redis
     at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.translateException(LettuceConnectionFactory.java:1866)
     at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.getConnection(LettuceConnectionFactory.java:1797)
 ```
-```
+``` text
 Caused by: io.lettuce.core.RedisCommandExecutionException:
 NOAUTH HELLO must be called with the client already authenticated
 ```
@@ -56,7 +56,7 @@ docker exec loglens-app-green env | grep REDIS
 ```
 
 **결과**: 환경 변수 정상 설정됨
-```
+``` text
 REDIS_PASSWORD=Loglens306#)^
 SPRING_REDIS_HOST=loglens-redis
 SPRING_REDIS_PORT=6379
