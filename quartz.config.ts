@@ -62,12 +62,15 @@ const config: QuartzConfig = {
       Plugin.CreatedModifiedDate({
         priority: ["frontmatter", "git", "filesystem"],
       }),
+	  Plugin.PrettyCode({
+	    defaultLang: "plaintext",  // 언어 없는 코드도 하이라이팅
+      }),
       Plugin.SyntaxHighlighting({
         theme: {
           light: "github-dark",
           dark: "github-dark",
         },
-        keepBackground:,
+        keepBackground: true,
       }),
       Plugin.ObsidianFlavoredMarkdown({ enableInHtmlEmbed: false }),
       Plugin.GitHubFlavoredMarkdown(),
@@ -75,9 +78,6 @@ const config: QuartzConfig = {
       Plugin.CrawlLinks({ markdownLinkResolution: "shortest" }),
       Plugin.Description(),
       Plugin.Latex({ renderEngine: "katex" }),
-	  Plugin.PrettyCode({
-	    defaultLang: "plaintext",  // 언어 없는 코드도 하이라이팅
-      }),
     ],
     filters: [Plugin.RemoveDrafts()],
     emitters: [
