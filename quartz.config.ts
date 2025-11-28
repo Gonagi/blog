@@ -62,15 +62,13 @@ const config: QuartzConfig = {
       Plugin.CreatedModifiedDate({
         priority: ["frontmatter", "git", "filesystem"],
       }),
-	  Plugin.PrettyCode({
-	    defaultLang: "plaintext",  // 언어 없는 코드도 하이라이팅
-      }),
       Plugin.SyntaxHighlighting({
         theme: {
           light: "github-dark",
           dark: "github-dark",
         },
         keepBackground: true,
+		defaultLanguage: "plaintext",
       }),
       Plugin.ObsidianFlavoredMarkdown({ enableInHtmlEmbed: false }),
       Plugin.GitHubFlavoredMarkdown(),
