@@ -28,6 +28,7 @@ title: Gonagi
 > 
 > ### 트러블슈팅
 > - [[OpenSearch 시간대 불일치로 인해 그래프가 0으로 표시된 문제]]
+> - [[ALB의 간헐적 타임아웃]]
 > - [[Logstash log_id 중복 생성 문제]]
 > - [[OpenSearch 인덱스 설계 개선 - 프로젝트 단위 인덱싱 구조로 전환하기]]
 > - [[OpenSearch TraceID 검색 실패 원인 분석 및 해결]]
