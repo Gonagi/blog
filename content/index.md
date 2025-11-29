@@ -27,10 +27,15 @@ title: Gonagi
 > - [[Bastion을 통한 Private 서버 SSH 접속 가이드]]
 > 
 > ### 트러블슈팅
+> - [[OpenSearch 시간대 불일치로 인해 그래프가 0으로 표시된 문제]]
 > - [[Logstash log_id 중복 생성 문제]]
 > - [[OpenSearch 인덱스 설계 개선 - 프로젝트 단위 인덱싱 구조로 전환하기]]
 > - [[OpenSearch TraceID 검색 실패 원인 분석 및 해결]]
+> - [[SSE 로그 스트리밍 401 인증 오류]]
 > - [[EC2 볼륨 확장이 적용되지 않는 문제]]
+> - [[HikariCP 커넥션 풀 고갈 원인 분석과 해결 과정]]
+> - [[Jenkins 빌드 로그 누적으로 인한 디스크 용량 부족 문제]]
+> - [[EC2 인스턴스 접속 불가 문제]]
 > - [[Redis 연결 오류]]
 > </details>
 
