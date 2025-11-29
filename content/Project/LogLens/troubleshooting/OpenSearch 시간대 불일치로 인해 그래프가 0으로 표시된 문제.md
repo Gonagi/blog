@@ -20,13 +20,26 @@
 
 ### 2.1 date_histogram의 timestamp 의미를 잘못 이해함
 
-OpenSearch에서 반환하는 `bucket.timestamp`는 **interval의 시작 시각(UTC)** 입니다.  
-하지만 저는 처음에 이걸 “그래프에 표시해야 하는 시각(KST)”이라고 착각해 그대로 매칭하려 했습니다.
+> OpenSearch의 date_histogram은 내부적으로 UTC 기준으로 버킷을 생성합니다.  
+> 
+> 하지만 **`time_zone: "+09:00"`을 설정하면 응답에 포함되는 `bucket.timestamp`는  KST(+09:00) 오프셋이 적용된 ISO-8601 문자열로 반환됩니다.**
+
+우리가 date_histogram에
+
+``` text
+"time_zone": "+09:00"
+```
+
+을 설정해 두었기 때문에,
+
+> **API 응답은 '+09:00' 오프셋이 적용된 ISO-8601 문자열(KST)로 반환됩니다.**
+
+그런데 저는 이 timestamp를  “그래프에 표시해야 하는 최종 시각(KST)”이라고 잘못 이해해 그대로 매칭했습니다.
 
 실제로는 다음처럼 해석해야 했습니다:
 ``` text
-bucket.timestamp = 구간 시작 (UTC)
-bucket.timestamp + interval = 그래프에 표시할 KST 시간
+bucket.timestamp = interval 시작 (KST)
+bucket.timestamp + interval = 그래프에 표시해야 하는 구간 끝 (KST)
 ```
 
 이 지점에서부터 매칭이 어긋나기 시작했습니다.
@@ -59,9 +72,9 @@ bucket.timestamp + interval = 그래프에 표시할 KST 시간
 ## 3. 해결 과정
 
 해결 과정에서는 크게 3가지를 바로잡았습니다.
-1. Repository에서 timestamp 해석 방식
-2. Mapper에서 interval 해석 방식
-3. TrafficMapper에서의 매칭 기준 통일
+1. Repository에서 timestamp 해석 방식 수정
+2. Mapper에서 interval 기준 명확화(시작 → 끝)
+3. TrafficMapper 기준도 동일하게 통일
 
 ## 3.1 Repository 단계: bucket.timestamp → “그대로 KST로 해석”만 수행
 
@@ -70,17 +83,32 @@ bucket.timestamp + interval = 그래프에 표시할 KST 시간
 - 하지만 date_histogram에 `time_zone: "+09:00"` 을 설정해 두었기 때문에  
     **우리 환경에서는 bucket.timestamp가 이미 KST(+09:00) 문자열**로 들어옴
 - 그 상태에서 다시 UTC로 처리하려 해서 두 번 변환되는 오류가 발생함
+``` java
+String timestampStr = bucket.keyAsString();
+ZonedDateTime zoned = ZonedDateTime.parse(timestampStr, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+
+// ❌ bucket.timestamp가 이미 KST(+09:00)인데,
+// UTC라고 오해하고 “역변환”을 수행함 → 시간 왜곡 발생
+LocalDateTime timestamp = zoned.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
+
+// ❌ 여기에 다시 KST로 재변환까지 적용
+timestamp = timestamp.atOffset(ZoneOffset.UTC)
+                     .withOffsetSameInstant(ZoneOffset.of("+09:00"))
+                     .toLocalDateTime();
+```
+즉, **UTC → KST 변환을 중복 적용**하면서  
+timestamp가 실제 시간에서 3시간씩 밀리는 문제가 발생했습니다.
 
 **수정 후**
 변환을 더 하지 않고, 들어온 값을 그대로 LocalDateTime으로 해석만 수행:
 ```java
 String timestampStr = bucket.keyAsString();
+
+// timestampStr은 이미 KST(+09:00) 문자열
 ZonedDateTime zoned = ZonedDateTime.parse(timestampStr, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
-// 기존: UTC라고 가정하고 다시 변환함 → 오류 원인
-// LocalDateTime timestamp = zoned.toLocalDateTime();
-
-// 수정: 이미 KST이므로 그대로 LDT로 사용
+// ✅ 수정된 로직
+// timestampStr은 이미 KST로 들어오므로 "그대로 파싱"만 하면 됨
 LocalDateTime timestamp = zoned.toLocalDateTime();
 ```
 즉, Repository는 _오직 ‘문자열 → LocalDateTime’_ 변환만 수행하도록 단순화했습니다.
@@ -88,33 +116,31 @@ LocalDateTime timestamp = zoned.toLocalDateTime();
 ---
 ### 3.2 LogTrendMapper: interval “시작” → interval “끝” 기준으로 변환
 
-OpenSearch bucket.timestamp는 “구간 시작(KST)”입니다.  
-하지만 그래프 timeSlot은 **구간 끝(KST)** 기준이었기 때문에 매칭이 어긋났습니다.
-
-그래서 Mapper에서는:
-
+OpenSearch bucket.timestamp는 “interval 시작(KST)”입니다.  
+하지만 실제 timeSlot은 “interval 끝(KST)”을 기준으로 생성되었습니다.
 ``` text
-bucket.start(KST) → bucket.end(KST) → truncated hour
+bucket.start(KST)  != timeSlot(KST)
 ```
 
-이렇게 변환해 매칭 기준을 통일했습니다.
-
+그래서 Mapper에서는:
 ``` java
 LocalDateTime startKst = agg.timestamp(); 
 LocalDateTime endKst = startKst.plusHours(INTERVAL_HOURS); 
 LocalDateTime key = endKst.truncatedTo(ChronoUnit.HOURS);
 ```
-
+이렇게 변환해 매칭 기준을 통일했습니다.
 timeSlots도 동일한 규칙으로 생성해 완전히 일치하도록 수정했습니다.
 
 ---
 ### 3.3 TrafficMapper: 시간 슬롯 생성 및 매칭 기준을 LogTrendMapper와 완전히 통일
 
-기존 TrafficMapper는 interval “시작” 기준, LogTrendMapper는 interval “끝” 기준을 사용하고 있어 매칭이 어긋나고 있었습니다.
+TrafficMapper에서도 기존에는 interval “시작” 기준을 사용하고 있어  
+LogTrendMapper와 매칭이 어긋나고 있었습니다.
 
 TrafficMapper도 동일하게 수정했습니다:
 ``` java
-LocalDateTime endTs = agg.timestamp().plusHours(INTERVAL_HOURS); LocalDateTime key = endTs.truncatedTo(ChronoUnit.HOURS);
+LocalDateTime endTs = agg.timestamp().plusHours(INTERVAL_HOURS); 
+LocalDateTime key = endTs.truncatedTo(ChronoUnit.HOURS);
 ```
 
 timeSlot 생성도:
