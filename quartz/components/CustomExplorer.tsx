@@ -36,19 +36,18 @@ export default (() => {
     const [indexData, setIndexData] = useState<any>({})
 
     useEffect(() => {
-      // 먼저 globalThis 확인 (빌드 타임에 주입된 경우)
-      const globalData = (globalThis as any).__INDEX_DATA__
-      if (globalData && Object.keys(globalData).length > 0) {
-        setIndexData(globalData)
-        return
-      }
-
-      // 없으면 JSON 파일 로드
       fetch("/index-data.json")
         .then((res) => res.json())
-        .then((data) => setIndexData(data))
+        .then((data) => {
+          console.log("Loaded index data:", data)
+          setIndexData(data)
+        })
         .catch((err) => console.error("Failed to load index data:", err))
     }, [])
+
+    if (Object.keys(indexData).length === 0) {
+      return <div class="custom-explorer">Loading...</div>
+    }
 
     return (
       <div class="custom-explorer">
