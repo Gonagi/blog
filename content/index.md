@@ -5,13 +5,13 @@ title: Gonagi
 # 프로젝트
 
 > [!abstract] **[[LogLens Index|LogLens]]** • 🔎
-> BE·FE·INFRA 로그를 통합 수집하고 AI로 분석·이상 징후를 탐지하는 관측 플랫폼
+> BE·FE·INFRA 로그를 수집하고 AI로 분석·이상 징후를 탐지하는 관측 플랫폼
 
 > [!abstract] **[[EatDa Index|EatDa]]** • 🍽
 > AI로 홍보하는, 내 주변 맛집 커뮤니티 플랫폼
 
 > [!abstract] **[[뽀송길 Index|뽀송길]]** • ☔
-> 비를 피하는 최적 경로 추천 서비스
+> 비를 피하는 최적 경로를 추천하는 서비스
 
 > [!abstract] **[[TripMate Index|TripMate]]** • ✈
 > 사용자 맞춤형 여행 추천 서비스
