@@ -1,5 +1,4 @@
 import fs from "fs"
-import path from "path"
 import { QuartzTransformerPlugin } from "../../cfg"
 import { parseIndexFile } from "./IndexParser"
 
@@ -32,13 +31,10 @@ export const IndexBuilder: QuartzTransformerPlugin = () => {
         }
       }
 
-      const outDir = "quartz/generated"
-      if (!fs.existsSync(outDir)) fs.mkdirSync(outDir)
+      // 🔥 JSON 파일 생성 대신 글로벌 변수에 저장
+      ;(globalThis as any).__INDEX_DATA__ = indexData
 
-      const outFile = path.join(outDir, "indexStructure.json")
-      fs.writeFileSync(outFile, JSON.stringify(indexData, null, 2))
-
-      console.log("✅ Index structure generated.")
+      console.log("✅ Index structure stored in globalThis.__INDEX_DATA__")
     },
   }
 }

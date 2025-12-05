@@ -1,5 +1,6 @@
 import { QuartzComponentConstructor, QuartzComponentProps } from "../types"
-import indexData from "../generated/indexStructure.js"
+
+declare const __INDEX_DATA__: any
 
 function Section({ title, items }: { title: string; items: any[] }) {
   return (
@@ -7,7 +8,9 @@ function Section({ title, items }: { title: string; items: any[] }) {
       <summary>{title}</summary>
       <ul>
         {items.map((it) => (
-          <li><a href={it.link}>{it.text}</a></li>
+          <li>
+            <a href={it.link}>{it.text}</a>
+          </li>
         ))}
       </ul>
     </details>
@@ -15,6 +18,8 @@ function Section({ title, items }: { title: string; items: any[] }) {
 }
 
 function IndexGroup({ name, data }: { name: string; data: any }) {
+  if (!data) return null
+
   return (
     <details>
       <summary>{name}</summary>
@@ -29,6 +34,8 @@ function IndexGroup({ name, data }: { name: string; data: any }) {
 
 export default (() => {
   return function CustomExplorer(_: QuartzComponentProps) {
+    const indexData = (globalThis as any).__INDEX_DATA__ ?? {}
+
     return (
       <div class="custom-explorer">
         <IndexGroup name="LogLens" data={indexData["LogLens"]} />
@@ -38,7 +45,6 @@ export default (() => {
         <IndexGroup name="Docker" data={indexData["Docker"]} />
         <IndexGroup name="Java" data={indexData["Java"]} />
 
-        {/* 기존 Explorer도 유지 */}
         <hr />
         <slot id="explorer" />
       </div>
