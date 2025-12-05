@@ -1,13 +1,14 @@
 import { QuartzComponentConstructor, QuartzComponentProps } from "../types"
-import { useEffect, useState } from "preact/hooks"
 
 function Section({ title, items }: { title: string; items: any[] }) {
+  if (!items || items.length === 0) return null
+
   return (
     <details>
       <summary>{title}</summary>
       <ul>
-        {items.map((it) => (
-          <li>
+        {items.map((it, idx) => (
+          <li key={idx}>
             <a href={it.link}>{it.text}</a>
           </li>
         ))}
@@ -17,14 +18,14 @@ function Section({ title, items }: { title: string; items: any[] }) {
 }
 
 function IndexGroup({ name, data }: { name: string; data: any }) {
-  if (!data) return null
+  if (!data || Object.keys(data).length === 0) return null
 
   return (
     <details>
       <summary>{name}</summary>
       <div>
-        {Object.keys(data).map((section) => (
-          <Section title={section} items={data[section]} />
+        {Object.keys(data).map((section, idx) => (
+          <Section key={idx} title={section} items={data[section]} />
         ))}
       </div>
     </details>
@@ -33,21 +34,8 @@ function IndexGroup({ name, data }: { name: string; data: any }) {
 
 export default (() => {
   return function CustomExplorer(_: QuartzComponentProps) {
-    const [indexData, setIndexData] = useState<any>({})
-
-    useEffect(() => {
-      fetch("/index-data.json")
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("Loaded index data:", data)
-          setIndexData(data)
-        })
-        .catch((err) => console.error("Failed to load index data:", err))
-    }, [])
-
-    if (Object.keys(indexData).length === 0) {
-      return <div class="custom-explorer">Loading...</div>
-    }
+    // 빌드 타임에 globalThis에서 데이터 가져오기
+    const indexData = (globalThis as any).__INDEX_DATA__ ?? {}
 
     return (
       <div class="custom-explorer">

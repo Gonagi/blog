@@ -68,14 +68,23 @@ export const IndexDataEmitter: QuartzEmitterPlugin = () => {
         }
       }
 
-      yield write({
-        ctx,
-        content: JSON.stringify(indexData),
-        slug: "index-data" as FullSlug,
-        ext: ".json",
-      })
+      // globalThis에 저장 (컴포넌트에서 접근 가능)
+      ;(globalThis as any).__INDEX_DATA__ = indexData
 
-      console.log(`✅ Index data emitted`)
+      console.log(`✅ Index data stored in globalThis`)
+    },
+    externalResources() {
+      // 빌드 타임 데이터를 클라이언트에 주입
+      const indexData = (globalThis as any).__INDEX_DATA__ ?? {}
+      return {
+        js: [
+          {
+            loadTime: "beforeDOMReady",
+            contentType: "inline",
+            script: `window.__INDEX_DATA__ = ${JSON.stringify(indexData)};`,
+          },
+        ],
+      }
     },
   }
 }
