@@ -1,4 +1,4 @@
-import { FullSlug, joinSegments } from "../../util/path"
+import { FullSlug, joinSegments, simplifySlug, slugifyFilePath } from "../../util/path"
 import { QuartzEmitterPlugin } from "../../cfg"
 import { write } from "./helpers"
 import fs from "fs"
@@ -10,7 +10,10 @@ export interface IndexTree {
   }[]
 }
 
-function parseIndexFile(filePath: string): IndexTree {
+function parseIndexFile(
+  filePath: string,
+  titleToSlugMap: Map<string, string>,
+): IndexTree {
   const content = fs.readFileSync(filePath, "utf8")
   const lines = content.split("\n")
 
@@ -26,15 +29,32 @@ function parseIndexFile(filePath: string): IndexTree {
       continue
     }
 
-    // [[링크|표시명]] 찾기
-    const linkMatch = line.match(/\[\[(.*?)\|(.*?)\]\]/)
-    if (linkMatch && currentSection) {
-      const link = linkMatch[1]
-      const text = linkMatch[2]
-      tree[currentSection].push({
-        text,
-        link: "/" + link.replace(/ /g, "_"),
-      })
+    // [[링크|표시명]] 또는 [표시명](URL) 찾기
+    const wikiLinkMatch = line.match(/\[\[(.*?)(?:\|(.*?))?\]\]/)
+    const markdownLinkMatch = line.match(/\[(.*?)\]\((.*?)\)/)
+
+    if (wikiLinkMatch && currentSection) {
+      const link = wikiLinkMatch[1].trim()
+      const text = wikiLinkMatch[2]?.trim() || link
+
+      // 외부 링크는 그대로 사용
+      if (link.startsWith("http://") || link.startsWith("https://")) {
+        tree[currentSection].push({ text, link })
+        continue
+      }
+
+      // titleToSlugMap에서 실제 slug 찾기
+      const slug = titleToSlugMap.get(link)
+      if (slug) {
+        tree[currentSection].push({ text, link: "/" + slug })
+      } else {
+        console.warn(`⚠ Could not find slug for: ${link}`)
+      }
+    } else if (markdownLinkMatch && currentSection) {
+      // 일반 마크다운 링크 (외부 링크)
+      const text = markdownLinkMatch[1]
+      const link = markdownLinkMatch[2]
+      tree[currentSection].push({ text, link })
     }
   }
 
@@ -44,8 +64,27 @@ function parseIndexFile(filePath: string): IndexTree {
 export const IndexDataEmitter: QuartzEmitterPlugin = () => {
   return {
     name: "IndexDataEmitter",
-    async *emit(ctx, _content, _resources) {
+    async *emit(ctx, content, _resources) {
       console.log("🔧 Building Index Structure...")
+
+      // 파일명 → slug 매핑 생성
+      const titleToSlugMap = new Map<string, string>()
+      for (const [_tree, file] of content) {
+        const title = file.data.frontmatter?.title
+        const slug = simplifySlug(file.data.slug!)
+
+        if (title) {
+          titleToSlugMap.set(title, slug)
+        }
+
+        // 파일명도 매핑 (확장자 제외)
+        const fileName = file.data.relativePath?.split("/").pop()?.replace(/\.md$/, "")
+        if (fileName) {
+          titleToSlugMap.set(fileName, slug)
+        }
+      }
+
+      console.log(`📝 Created title-to-slug mapping with ${titleToSlugMap.size} entries`)
 
       const INDEX_PATHS: Record<string, string> = {
         LogLens: "content/Project/LogLens/LogLens Index.md",
@@ -61,7 +100,7 @@ export const IndexDataEmitter: QuartzEmitterPlugin = () => {
       for (const key in INDEX_PATHS) {
         const filePath = INDEX_PATHS[key]
         if (fs.existsSync(filePath)) {
-          indexData[key] = parseIndexFile(filePath)
+          indexData[key] = parseIndexFile(filePath, titleToSlugMap)
           console.log(`✅ Parsed: ${filePath}`)
         } else {
           console.warn(`⚠ Index file not found: ${filePath}`)
