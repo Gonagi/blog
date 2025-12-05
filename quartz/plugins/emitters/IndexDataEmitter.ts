@@ -1,5 +1,6 @@
-import { FilePath, joinSegments } from "../../util/path"
+import { FullSlug, joinSegments } from "../../util/path"
 import { QuartzEmitterPlugin } from "../../cfg"
+import { write } from "./helpers"
 import fs from "fs"
 
 export interface IndexTree {
@@ -43,7 +44,7 @@ function parseIndexFile(filePath: string): IndexTree {
 export const IndexDataEmitter: QuartzEmitterPlugin = () => {
   return {
     name: "IndexDataEmitter",
-    async emit(ctx, _content, _resources): Promise<FilePath[]> {
+    async *emit(ctx, _content, _resources) {
       console.log("🔧 Building Index Structure...")
 
       const INDEX_PATHS: Record<string, string> = {
@@ -67,15 +68,14 @@ export const IndexDataEmitter: QuartzEmitterPlugin = () => {
         }
       }
 
-      // JSON 파일 생성 (디렉토리 먼저 확인)
-      await fs.promises.mkdir(ctx.argv.output, { recursive: true })
+      yield write({
+        ctx,
+        content: JSON.stringify(indexData),
+        slug: "index-data" as FullSlug,
+        ext: ".json",
+      })
 
-      const outputPath = joinSegments(ctx.argv.output, "index-data.json") as FilePath
-      await fs.promises.writeFile(outputPath, JSON.stringify(indexData, null, 2))
-
-      console.log(`✅ Index data saved to: ${outputPath}`)
-
-      return [outputPath]
+      console.log(`✅ Index data emitted`)
     },
   }
 }
