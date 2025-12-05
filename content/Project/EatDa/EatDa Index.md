@@ -1,3 +1,6 @@
+---
+category: Project/02_EatDa
+---
 ### 1. 트러블슈팅
  - [[Redis Streams 도입기|1.1 Redis Streams 도입기]]
 	 - [[리뷰 생성 기능 성능 최적화 - CPU 병목 해소와 비동기 처리 도입|1.1.1 리뷰 생성 기능 성능 최적화 - CPU 병목 해소와 비동기 처리 도입]]
