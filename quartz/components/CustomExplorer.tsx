@@ -1,6 +1,5 @@
 import { QuartzComponentConstructor, QuartzComponentProps } from "../types"
-
-declare const __INDEX_DATA__: any
+import { useEffect, useState } from "preact/hooks"
 
 function Section({ title, items }: { title: string; items: any[] }) {
   return (
@@ -34,7 +33,22 @@ function IndexGroup({ name, data }: { name: string; data: any }) {
 
 export default (() => {
   return function CustomExplorer(_: QuartzComponentProps) {
-    const indexData = (globalThis as any).__INDEX_DATA__ ?? {}
+    const [indexData, setIndexData] = useState<any>({})
+
+    useEffect(() => {
+      // 먼저 globalThis 확인 (빌드 타임에 주입된 경우)
+      const globalData = (globalThis as any).__INDEX_DATA__
+      if (globalData && Object.keys(globalData).length > 0) {
+        setIndexData(globalData)
+        return
+      }
+
+      // 없으면 JSON 파일 로드
+      fetch("/index-data.json")
+        .then((res) => res.json())
+        .then((data) => setIndexData(data))
+        .catch((err) => console.error("Failed to load index data:", err))
+    }, [])
 
     return (
       <div class="custom-explorer">
