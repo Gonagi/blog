@@ -1,5 +1,6 @@
 import { customImageTransformer } from "./quartz/plugins/transformers/customImageTransformer"
 import { QuartzConfig } from "./quartz/cfg"
+import { IndexBuilder } from "./quartz/plugins/transformers/IndexBuilder"
 import * as Plugin from "./quartz/plugins"
 
 /**
@@ -57,6 +58,7 @@ const config: QuartzConfig = {
   },
   plugins: {
     transformers: [
+	  IndexBuilder(),
       customImageTransformer(),
       Plugin.FrontMatter(),
       Plugin.CreatedModifiedDate({
