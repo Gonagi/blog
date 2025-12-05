@@ -1,5 +1,5 @@
 import { QuartzComponentConstructor, QuartzComponentProps } from "../types"
-import indexData from "../../generated/indexStructure.js"
+import indexData from "../generated/indexStructure.js"
 
 function Section({ title, items }: { title: string; items: any[] }) {
   return (
