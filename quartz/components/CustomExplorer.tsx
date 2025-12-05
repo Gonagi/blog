@@ -1,14 +1,15 @@
 import { QuartzComponentConstructor, QuartzComponentProps } from "../types"
+import style from "./styles/customExplorer.scss"
 
 function Section({ title, items }: { title: string; items: any[] }) {
   if (!items || items.length === 0) return null
 
   return (
-    <details>
-      <summary>{title}</summary>
-      <ul>
+    <details class="section-details">
+      <summary class="section-summary">{title}</summary>
+      <ul class="section-list">
         {items.map((it, idx) => (
-          <li key={idx}>
+          <li key={idx} class="section-item">
             <a href={it.link}>{it.text}</a>
           </li>
         ))}
@@ -21,9 +22,9 @@ function IndexGroup({ name, data }: { name: string; data: any }) {
   if (!data || Object.keys(data).length === 0) return null
 
   return (
-    <details>
-      <summary>{name}</summary>
-      <div>
+    <details class="index-group">
+      <summary class="index-group-summary">{name}</summary>
+      <div class="index-group-content">
         {Object.keys(data).map((section, idx) => (
           <Section key={idx} title={section} items={data[section]} />
         ))}
@@ -33,7 +34,7 @@ function IndexGroup({ name, data }: { name: string; data: any }) {
 }
 
 export default (() => {
-  return function CustomExplorer(_: QuartzComponentProps) {
+  function CustomExplorer(_: QuartzComponentProps) {
     // 빌드 타임에 globalThis에서 데이터 가져오기
     const indexData = (globalThis as any).__INDEX_DATA__ ?? {}
 
@@ -51,4 +52,7 @@ export default (() => {
       </div>
     )
   }
+
+  CustomExplorer.css = style
+  return CustomExplorer
 }) satisfies QuartzComponentConstructor

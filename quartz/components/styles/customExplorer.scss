@@ -1,0 +1,71 @@
+.custom-explorer {
+  // 최상위 그룹 (LogLens, EatDa 등)
+  .index-group {
+    margin-bottom: 0.5rem;
+
+    .index-group-summary {
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0.4rem 0;
+      color: var(--secondary);
+
+      &:hover {
+        color: var(--tertiary);
+      }
+    }
+
+    .index-group-content {
+      margin-left: 0.5rem;
+      padding-left: 0.5rem;
+      border-left: 2px solid var(--lightgray);
+    }
+  }
+
+  // 섹션 (1. 백엔드 라이브러리, 2. 인프라 등)
+  .section-details {
+    margin-top: 0.3rem;
+    margin-bottom: 0.3rem;
+
+    .section-summary {
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 0.3rem 0;
+      color: var(--darkgray);
+
+      &:hover {
+        color: var(--dark);
+      }
+    }
+
+    .section-list {
+      list-style: none;
+      padding-left: 1rem;
+      margin: 0.2rem 0;
+
+      .section-item {
+        margin: 0.2rem 0;
+
+        a {
+          font-size: 0.85rem;
+          color: var(--gray);
+          text-decoration: none;
+          display: block;
+          padding: 0.2rem 0;
+
+          &:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+
+  hr {
+    margin: 1rem 0;
+    border: none;
+    border-top: 1px solid var(--lightgray);
+  }
+}
