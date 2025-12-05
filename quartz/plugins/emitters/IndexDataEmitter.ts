@@ -67,7 +67,9 @@ export const IndexDataEmitter: QuartzEmitterPlugin = () => {
         }
       }
 
-      // JSON 파일 생성
+      // JSON 파일 생성 (디렉토리 먼저 확인)
+      await fs.promises.mkdir(ctx.argv.output, { recursive: true })
+
       const outputPath = joinSegments(ctx.argv.output, "index-data.json") as FilePath
       await fs.promises.writeFile(outputPath, JSON.stringify(indexData, null, 2))
 
