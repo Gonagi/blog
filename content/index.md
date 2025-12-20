@@ -1,7 +1,6 @@
 ---
 title: Gonagi
 ---
-
 # 프로젝트
 
 > [!abstract] **[[LogLens Index|LogLens]]** • 🔎
@@ -15,6 +14,13 @@ title: Gonagi
 
 > [!abstract] **[[TripMate Index|TripMate]]** • ✈
 > 사용자 맞춤형 여행 추천 서비스
+
+---
+
+# 인프런
+
+> [!note] **[[인프런 Index|인프런]]**
+> 인프런 강의를 수강하며 정리한 개인 학습 노트
 
 ---
 
