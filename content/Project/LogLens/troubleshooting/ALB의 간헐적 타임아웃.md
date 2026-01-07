@@ -143,7 +143,7 @@ Route Table: rtb-0580b9f2d29113b29
 
 ### 3.1 문제 발견
 
-라우팅 테이블 수정 후 새로운 유형의 에러가 발생했습니다.
+1차 문제(퍼블릭 서브넷 IGW 경로 누락)를 해결한 이후,  간헐적인 타임아웃은 사라졌지만 새로운 에러가 발생했다.
 ```bash
 curl https://loglens.store
 # 결과: 502 Bad Gateway
@@ -154,7 +154,7 @@ curl https://loglens.store
 
 **HTTP 502의 의미**
 
-> Bad Gateway = ALB가 타겟으로부터 유효하지 않은 응답을 받았거나, 타겟에 도달할 수 없음을 의미합니다.
+> **Bad Gateway**는 ALB가 요청을 정상적으로 수신했으나, 백엔드 타겟(Target Group)으로 요청을 전달하지 못했거나 유효한 응답을 받지 못했음을 의미한다.
 
 **인프라 구조 확인**
 ``` text
@@ -169,99 +169,56 @@ Cross-Zone Load Balancing: ❌ OFF (기본값)
 ```
 
 ---
-### 3.3 Cross-Zone Load Balancing 문제
+### 3.3 당시 타겟 그룹 상태 확인
 
-**OFF 상태 (기본값) - 문제 발생**
-``` text
-┌─────────────────────────┐    ┌─────────────────────────┐
-│  ap-northeast-2a        │    │  ap-northeast-2c        │
-│  ┌──────┐               │    │  ┌──────┐               │
-│  │ ALB  │               │    │  │ ALB  │               │
-│  │ Node │               │    │  │ Node │               │
-│  └──┬───┘               │    │  └──┬───┘               │
-│     │                   │    │     │                   │
-│     ↓ (자신의 AZ만)       │    │     ↓ (자신의 AZ만)        │
-│  ┌─────┐ ┌─────┐        │    │   (타겟 없음)             │
-│  │EC2-1│ │EC2-2│ ✅     │    │     ❌ 502 에러!          │
-│  └─────┘ └─────┘        │    │                         │
-└─────────────────────────┘    └─────────────────────────┘
+ALB가 연결하고 있는 타겟 그룹들의 헬스 상태를 확인했다.
+``` bash
+jenkins-tg (포트 9000):
+└── ❌ UNHEALTHY (403 Forbidden)
+
+spring-blue (포트 8080):
+└── ❌ UNHEALTHY
+
+spring-green (포트 8081):
+└── ❌ UNHEALTHY (헬스체크 실패)
+```
+**모든 Target Group에 Healthy 상태의 타겟이 존재하지 않는 상황**이었다.
+
+---
+### 3.4 문제 발생 메커니즘
+``` bash
+요청 흐름:
+
+1. 클라이언트 요청이 ALB에 도착
+2. ALB 리스너 규칙에 따라 Target Group 선택
+3. 선택된 Target Group 내에 Healthy Target이 없음
+4. ALB가 백엔드로 요청 전달 불가 판단
+5. 502 Bad Gateway 응답 반환
 ```
 
-**문제 발생 메커니즘**
-``` text
-시나리오 1: 2a AZ 노드로 요청
-클라이언트 → ALB(2a) → EC2(2a) ✅ 정상 응답
-
-시나리오 2: 2c AZ 노드로 요청
-클라이언트 → ALB(2c) → ❌ 2c에 타겟 없음
-                     → Cross-Zone OFF
-                     → 다른 AZ 타겟 사용 불가
-                     → 502 Bad Gateway
-```
+이 상태에서는 요청이 어떤 AZ의 ALB 노드로 들어오든 관계없이, **ALB가 요청을 전달할 수 있는 백엔드 자체가 존재하지 않았다.**
 
 ---
-### 3.4 Cross-Zone Load Balancing이란?
+### 3.5 원인 요약
 
-**OFF 상태**: 각 ALB 노드는 자신의 AZ에 있는 타겟만 사용
-
-**ON 상태 (권장)**: 모든 ALB 노드가 모든 AZ의 타겟 사용 가능
-``` text
-┌─────────────────────────┐    ┌─────────────────────────┐
-│  ap-northeast-2a        │    │  ap-northeast-2c        │
-│  ┌──────┐               │    │  ┌──────┐               │
-│  │ ALB  │◄──────────────┼────┼─►│ ALB  │               │
-│  │ Node │───────────────┼───►│  │ Node │               │
-│  └──┬───┘               │    │  └──┬───┘               │
-│     │                   │    │     │                   │
-│     ↓                   │    │     └──────┐ (모든 AZ)   │
-│  ┌─────┐ ┌─────┐        │    │            ↓            │
-│  │EC2-1│ │EC2-2│ ✅     │◄───┼───────  EC2-1, EC2-2    │
-│  └─────┘ └─────┘        │    │        사용 가능 ✅       │
-└─────────────────────────┘    └─────────────────────────┘
-```
----
-### 3.5 해결 방법 - Cross-Zone Load Balancing 활성화
-
-> ALB는 기본적으로 Load Balancer 레벨에서 Cross-Zone이 항상 켜져 있지만, **타겟 그룹 레벨에서는 별도 설정이 필요**합니다.
-
-**AWS 콘솔 방법**
-
-1. EC2 → Target Groups 선택
-2. 문제의 타겟 그룹 선택 (spring-blue, spring-green 등)
-3. Attributes 탭 클릭
-4. Edit 버튼 클릭
-5. Cross-zone load balancing:
-   - 현재: Off 또는 Use load balancer configuration
-   - 변경: On ✅
-6. Save changes
+502 Bad Gateway의 직접적인 원인은 다음과 같다.
+- ALB 리스너는 정상 동작
+- 네트워크 및 보안 그룹 설정도 정상
+- **그러나 요청이 전달된 Target Group에 Healthy Target이 0개**
+- 결과적으로 ALB가 백엔드 연결에 실패
 
 ---
-### 3.7 해결 결과
-
-| 설정             | 2a 노드    | 2c 노드       |
-| -------------- | -------- | ----------- |
-| Cross-Zone OFF | 2a 타겟만 ✅ | 타겟 없음 ❌ 502 |
-| Cross-Zone ON  | 모든 타겟 ✅  | 모든 타겟 ✅ 해결  |
-
+### 3.6 결과
+- 네트워크 문제가 아닌 **타겟 그룹 헬스 상태 문제**임을 확인
+- 이후 애플리케이션 상태 및 헬스체크 설정을 점검
+- 정상적인 Target Group이 확보된 이후 502 에러 해소
 ---
-
-### 3.8 Cross-Zone Load Balancing 장단점
-
-**장점**
-- 고가용성 향상 (한 AZ 장애 시에도 서비스 가능)
-- 트래픽 분산 개선 (모든 타겟에 균등 분산)
-- 유연한 배포 (모든 AZ에 타겟 배치 불필요)
-
-**단점**
-- Cross-AZ 데이터 전송 비용 발생 ($0.01/GB)
-- 약간의 지연 시간 증가 (1-2ms)
-- 복잡한 장애 격리 (한 AZ 문제가 다른 AZ에 영향)
----
-## 4. 3차 문제 - 503 Service Unavailable
+## 4. 3차 문제 – 503 Service Unavailable
 
 ### 4.1 문제 재발견
 
-Cross-Zone 설정 후에도 특정 경로에서 503 에러가 발생했습니다.
+2차 문제(502 Bad Gateway)의 원인이었던 타겟 그룹 헬스 상태를 점검·조치한 이후에도,  
+일부 요청에서 여전히 **503 Service Unavailable** 에러가 발생했다.
 ```bash
 curl http://43.202.200.102
 # 결과: 302 Found ✅ 정상
@@ -270,15 +227,23 @@ curl -k https://52.78.216.127
 # 결과: 503 Service Temporarily Unavailable ❌
 ```
 
+동일한 ALB에 대한 요청임에도, 요청 방식에 따라 응답 결과가 달라지는 현상이 관찰되었다.
+
 ---
 ### 4.2 원인 분석
 
 **HTTP 503의 의미**
 
-> Service Temporarily Unavailable = ALB가 요청을 처리할 healthy한 타겟을 찾지 못했음을 의미합니다.
+> **Service Unavailable**은 ALB가 요청을 처리할 수 있는 **Healthy Target을 찾지 못했을 때** 반환하는 응답이다.
 
-**타겟 그룹 헬스 상태 확인**
-``` text
+즉, 네트워크 단절이나 ALB 장애가 아니라 **요청이 전달된 Target Group의 상태 문제**를 의미한다.
+
+---
+### 4.3 타겟 그룹 헬스 상태 확인
+
+각 target Group의 상태를 다시 확인했다.
+
+```text
 jenkins-tg (포트 9000):
 └── ❌ UNHEALTHY (403 Forbidden)
 
@@ -288,208 +253,160 @@ spring-blue (포트 8080):
 spring-green (포트 8081):
 └── ❌ UNHEALTHY (헬스체크 실패)
 ```
+- `spring-blue`만 정상(HEALTHY)
+- `spring-green`, `jenkins-tg`는 여전히 Unhealthy 상태
 
 ---
-### 4.3 ALB 리스너 라우팅 규칙 확인
-``` text
-HTTPS:443 리스너:
+### 4.4 리스너 및 라우팅 규칙 분석
+
+HTTPS(443) 리스너의 라우팅 규칙을 확인했다.
+```text
+HTTPS:443 리스너
 ├── Host: jenkins_be.loglens.co.kr
-│   └── Forward to: jenkins-tg ❌ (UNHEALTHY)
+│   └── Forward → jenkins-tg ❌ (UNHEALTHY)
 │
 ├── Host: api.loglens.co.kr
-│   └── Forward to: spring-blue ✅ (HEALTHY)
+│   └── Forward → spring-blue ✅ (HEALTHY)
 │
-└── Default (기본 규칙) ← 🚨 여기가 문제!
-    └── Forward to: spring-green ❌ (UNHEALTHY)
+└── Default Rule
+    └── Forward → spring-green ❌ (UNHEALTHY)
 ```
 
-**문제 흐름**
-``` text
-1. 대부분의 요청 → 기본 규칙 매칭
-   (jenkins_be, api 외의 모든 요청)
-
-2. 기본 규칙 → spring-green (8081)
-   └── spring-green이 UNHEALTHY 상태
-
-3. ALB → healthy한 타겟 없음
-   └── 503 Service Temporarily Unavailable 반환
+**문제 흐름은 다음과 같았다.**
+```text
+1. 특정 요청이 Host 기반 규칙과 매칭되지 않음
+2. Default Rule 적용
+3. Default Rule이 spring-green Target Group을 가리킴
+4. spring-green은 Unhealthy 상태
+5. ALB가 Healthy Target을 찾지 못함
+6. 503 Service Unavailable 반환
 ```
 
+이로 인해,
+- `api.loglens.co.kr` 요청은 정상 처리
+- 그 외 대부분의 요청은 **Unhealthy Target Group으로 전달되어 503 발생**
 ---
-### 4.4 왜 한 IP는 정상이고 한 IP는 503인가?
-``` text
-43.202.200.102 노드: 
-└── 네트워크 경로 안정적 → 일부 요청 정상
+### 4.5 추가 조사 – AZ 및 네트워크 영향 여부 확인
 
-52.78.216.127 노드: 
-└── 네트워크 경로 불안정 + unhealthy 타겟 
-    → 503 에러 발생
-```
----
-### 4.5 추가 조사 - AZ 위치 확인
+503 에러가 특정 요청에서만 발생했기 때문에,  
+ALB와 EC2가 서로 다른 AZ에 위치해 통신 문제가 발생한 것은 아닌지 추가로 확인했다.
 
-EC2가 다른 AZ에 있어서 Cross-AZ 통신 문제가 발생하는 것 아닐까?
-
-**실제 구조**
-``` text
+**실제 인프라 구조**
+```text
 ALB:
 ├── ap-northeast-2a (퍼블릭 서브넷)
 └── ap-northeast-2c (퍼블릭 서브넷)
 
 EC2:
 └── ap-northeast-2a (프라이빗 서브넷)
-
-결론: 같은 AZ였음! Cross-AZ 문제가 아니었다!
 ```
+- EC2는 `ap-northeast-2a`에 위치
+- ALB 역시 동일 AZ(`2a`)에 노드를 보유
+
+→ **AZ 간 통신 여부와는 무관한 문제**임을 확인했다.
 
 ---
 ### 4.6 보안 그룹 검증
 
-**ALB 보안 그룹**
-``` text
-loglens-sg-elb:
+다음으로, 보안 그룹 설정에 의해 트래픽이 차단되고 있는지 점검했다.
+#### ALB 보안 그룹
+```text
+loglens-sg-elb
 
 Inbound:
-├── TCP 80  ← 0.0.0.0/0 ✅
-└── TCP 443 ← 0.0.0.0/0 ✅
+├── TCP 80  ← 0.0.0.0/0
+└── TCP 443 ← 0.0.0.0/0
 
 Outbound:
-└── All traffic → 0.0.0.0/0 ✅
+└── All traffic → 0.0.0.0/0
 ```
 
-**EC2 보안 그룹**
-``` text
-loglens-server:
+#### EC2 보안 그룹
+```text
+loglens-server
 
 Inbound:
-├── TCP 8080 ← ALB SG ✅ (spring-blue)
-├── TCP 8081 ← ALB SG ✅ (spring-green)
-├── TCP 9000 ← ALB SG ✅ (jenkins)
-└── TCP 22   ← bastion SG ✅
+├── TCP 8080 ← ALB SG (spring-blue)
+├── TCP 8081 ← ALB SG (spring-green)
+├── TCP 9000 ← ALB SG (jenkins)
+└── TCP 22   ← bastion SG
 
 Outbound:
-└── All traffic → 0.0.0.0/0 ✅
-
-결론: 보안 그룹 설정은 완벽함!
+└── All traffic → 0.0.0.0/0
 ```
+- ALB → EC2 포트 접근 허용
+- 인바운드 / 아웃바운드 모두 정상
+
+→ **보안 그룹으로 인한 차단 가능성도 배제**할 수 있었다.
+
 ---
-### 4.7 최종 원인 특정
-``` text
-503 에러의 진짜 원인:
+### 4.7 최종 원인 확정
 
-1. spring-green (8081) 애플리케이션 문제
-   └── 서비스 다운 또는 헬스체크 실패
+추가 조사 결과를 종합한 결과, 503 에러의 원인은 다음으로 정리되었다.
+```text
+503 Service Unavailable의 원인:
 
-2. ALB 기본 라우팅 설정 오류
-   └── 대부분의 요청이 unhealthy한 타겟으로 전달
+1. spring-green (8081) 애플리케이션이 Unhealthy 상태
+   └── 서비스 미기동 또는 헬스체크 실패
 
-3. 타겟 그룹 "unused" 상태
-   └── spring-green 타겟 그룹이 제대로 구성되지 않음
+2. HTTPS 리스너의 기본(Default) 라우팅 규칙이
+   spring-green Target Group을 가리키고 있음
 
-네트워크는 정상! 애플리케이션 레벨 문제!
+3. 기본 규칙에 매칭되는 요청이
+   Healthy Target이 없는 Target Group으로 전달됨
 ```
 ---
 ### 4.8 해결 방법
 
-**1. 즉시 조치 - 기본 라우팅 변경**
-``` text
-HTTPS:443 리스너:
+#### 4.8.1 즉시 조치 – 기본 라우팅 규칙 수정
+
+HTTPS(443) 리스너의 기본(Default) 규칙을 항상 Healthy 상태인 Target Group으로 변경했다.
+```text
+HTTPS:443 리스너
 ├── Host: jenkins_be.loglens.co.kr
-│   └── Forward to: jenkins-tg
-│
+│   └── Forward → jenkins-tg
 ├── Host: api.loglens.co.kr
-│   └── Forward to: spring-blue
-│
-└── Default (기본 규칙) ← 변경!
-    └── Forward to: spring-blue ✅ (HEALTHY)
+│   └── Forward → spring-blue
+└── Default Rule (변경)
+    └── Forward → spring-blue ✅ (HEALTHY)
 ```
+이를 통해,  Host 규칙에 매칭되지 않는 요청도 정상 처리되도록 개선했다.
 
-**2. 자동화 조치 - Jenkins Blue-Green 배포 파이프라인**
+---
+#### 4.8.2 추가 조치 Blue-Green 배포 자동화
 
-수동으로 매번 ALB 규칙을 변경하는 것은 번거롭고 휴먼 에러가 발생할 수 있습니다. Jenkins 파이프라인을 통해 이 과정을 자동화했습니다.
+수동으로 리스너 규칙을 변경하는 방식은 휴먼 에러 가능성이 높기 때문에,  
+Jenkins 파이프라인을 통해 트래픽 전환을 자동화했다.
 
-**Jenkins 파이프라인 주요 단계**
+**파이프라인 주요 단계**
 ```groovy
 // 1. 배포 대상 결정
-stage('Determine Target Environment') {
-    // Blue가 실행 중이면 Green에 배포
-    // Green이 실행 중이면 Blue에 배포
-}
-
-// 2. 새 버전 배포
-stage('Deploy New Version') {
-    // 새로운 컨테이너 실행 (Blue 또는 Green)
-}
-
-// 3. 헬스체크
-stage('Health Check') {
-    // 새 버전이 정상 작동하는지 확인
-}
-
-// 4. 트래픽 전환 (핵심!)
-stage('Switch Traffic') {
-    // ALB 규칙을 새 버전(HEALTHY)으로 자동 변경
-}
+// 2. 신규 버전 배포 (Blue 또는 Green)
+// 3. 헬스체크 통과 여부 확인
+// 4. ALB 리스너 규칙을 Healthy Target Group으로 자동 전환
 ```
 
-**트래픽 전환 자동화 핵심 코드**
-```groovy
-stage('Switch Traffic') {
-    steps {
-        script {
-            sh """#!/bin/bash
-                # 배포 대상에 따라 Target Group 결정
-                if [ "${env.DEPLOY_TARGET}" = "blue" ]; then
-                    TG_NAME="\${BLUE_TG}"
-                else
-                    TG_NAME="\${GREEN_TG}"
-                fi
-                
-                # Target Group ARN 조회
-                TG_ARN=\$(aws elbv2 describe-target-groups \
-                    --names "\$TG_NAME" \
-                    --query 'TargetGroups[0].TargetGroupArn' \
-                    --output text \
-                    --region \${AWS_REGION})
-                
-                # ALB Listener 규칙 수정
-                aws elbv2 modify-rule \
-                    --rule-arn "\${ALB_RULE_ARN}" \
-                    --actions Type=forward,TargetGroupArn="\$TG_ARN" \
-                    --region \${AWS_REGION}
-            """
-        }
-    }
-}
-```
+**동작 흐름**
+```text
+배포 전:
+Default Rule → spring-green (UNHEALTHY)
+→ 503 발생
 
-**작동 방식**
-``` text
-배포 전 상태:
-Default Rule → spring-green (8081) ❌ UNHEALTHY
-→ 503 Service Unavailable
-
-Jenkins 파이프라인 실행:
-1. Blue 환경에 새 버전 배포 (8080)
-2. Health Check 통과 확인
-3. AWS CLI로 ALB 규칙 자동 변경:
-   - ALB_RULE_ARN의 대상을 spring-blue로 변경
-4. Old Environment (green) 정리
-
-배포 후 상태:
-Default Rule → spring-blue (8080) ✅ HEALTHY
+배포 후:
+Default Rule → spring-blue (HEALTHY)
 → 200 OK
 ```
 
 ---
 ## 5. 결론
+### 5.1 문제 요약 (최종)
 
-### 5.1 문제 요약
+| 문제 유형                   | 원인                                          | 해결                |
+| ----------------------- | ------------------------------------------- | ----------------- |
+| 간헐적 타임아웃                | 퍼블릭 서브넷 IGW 경로 누락                           | 라우팅 테이블 수정        |
+| 502 Bad Gateway         | Healthy Target이 없는 Target Group으로 요청 전달     | 타겟 그룹 헬스 정상화      |
+| 503 Service Unavailable | Default 라우팅 규칙이 Unhealthy Target Group을 가리킴 | 기본 규칙 변경 + 배포 자동화 |
 
-| 문제 유형                   | 원인                            | 해결                    |
-| ----------------------- | ----------------------------- | --------------------- |
-| 간헐적 타임아웃                | 퍼블릭 서브넷 IGW 경로 누락             | 라우팅 테이블 수정            |
-| 502 Bad Gateway         | Cross-Zone Load Balancing 미설정 | 타겟 그룹별 Cross-Zone 활성화 |
-| 503 Service Unavailable | Unhealthy 타겟 + 잘못된 기본 라우팅     | 기본 규칙 변경 + 애플리케이션 수정  |
-
-
+> **본 장애는 네트워크 문제가 아닌,  
+> 
+> ALB 리스너 라우팅 규칙과 타겟 그룹 헬스 상태 관리 미흡으로 발생한 문제였다.**
