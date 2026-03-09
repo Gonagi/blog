@@ -21,6 +21,4 @@ category: Project/01_뽀송길
 - [3.4 시연영상](https://youtu.be/pW2QbOUD66s)
 - [3.5 GitHub 주소](https://github.com/Gonagi/pposonggil_v2)
 ### 4. 특허
- - [4.1 뽀송길_발명신고서](https://drive.google.com/file/d/1_fZTv2taQnOpr-6V0mWEHvOHQl5bnMbx/view?usp=sharing)
- - [4.2 뽀송길_출원명세서_검토_의뢰서](https://drive.google.com/file/d/1zlzwJs632xbQXTzPHBOILQp1A8I4aWoL/view?usp=drive_link)
- - [4.3 해외 출원 기술설명서](https://docs.google.com/presentation/d/1XoxPb5tSyJI2GB6fRGezKFaXICcB3cYN/edit?usp=sharing&ouid=111875955541227552351&rtpof=true&sd=true)
+ - [4.1 특허 명세서](https://drive.google.com/file/d/1BqbH9mqQPMe8iml9xVuBqoSrhSbSwR9L/view?usp=drive_link)
