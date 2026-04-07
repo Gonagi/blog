@@ -31,14 +31,13 @@ title: Gonagi
 
 ---
 
-# Docker
+# 기타 
+
+> [!note] **[[CS Index|잡다한 것들]]**
+> 운영체제, 시스템 보안 등 CS 기초 정리
 
 > [!info] **[[Docker Index|Docker]]**
 > 컨테이너 기술 및 Docker 학습 정리
-
----
-
-# Java
 
 > [!tip] **[[Java Index|Java]]**
 > Java 언어 및 JVM 관련 정리
