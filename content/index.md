@@ -33,8 +33,8 @@ title: Gonagi
 
 # 기타 
 
-> [!note] **[[CS Index|잡다한 것들]]**
-> 운영체제, 시스템 보안 등 CS 기초 정리
+> [!note] **[[잡다한 것들 Index|잡다한 것들]]**
+> 이것 저것
 
 > [!info] **[[Docker Index|Docker]]**
 > 컨테이너 기술 및 Docker 학습 정리
