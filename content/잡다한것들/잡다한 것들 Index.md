@@ -6,4 +6,5 @@
 6. [[동시성 제어와 동기화 구조]]
 7. [[데드락]]
 8. [[데이터베이스 구조와 동작]]
-9. [[Relational Data model]]
+9. [[Relational Data Model]]
+10. [[Stored Procedure의 장단점과 사용 기준]]
