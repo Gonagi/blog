@@ -9,3 +9,4 @@
 9. [[Relational Data Model]]
 10. [[Stored Procedure의 장단점과 사용 기준]]
 11. [[SSO 1 - 기본 개념과 인증 흐름]]
+12. [[SSO 2 - 구현 모델과 운영 관점]]
