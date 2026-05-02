@@ -35,7 +35,7 @@
 
 > attribute와 tuple로 이루어진 데이터들의 집합
 
-![506](https://i.imgur.com/oDWrKpJ.png)
+![|506](https://i.imgur.com/oDWrKpJ.png)
 ### 2.1 Domain
 
 > 각 attribute가 가질 수 있는 값의 집합
@@ -193,26 +193,26 @@ STUDENT(id, name, grade, major, phone_num, emer_phone_num)
 
 > attribute의 value는 해당 attribute의 domian에 속한 value여야 한다.
 
-![471](https://i.imgur.com/uAfCNw4.png)
+![|471](https://i.imgur.com/uAfCNw4.png)
 #### 7.2.2 Key Constraints
 
 > 서로 다른 tuples는 같은 value의 key를 가질 수 없다.
 > key는 unique해야 한다.
 
-![474](https://i.imgur.com/M4VHScS.png)
+![|474](https://i.imgur.com/M4VHScS.png)
 #### 7.2.3 NOT NULL Constraint
 
 > attribute이 NOT NULL로 명시됐다면 NULL을 값으로 가질 수 없다.
 
-![472](https://i.imgur.com/3yyUhdg.png)
+![|472](https://i.imgur.com/3yyUhdg.png)
 #### 7.2.4 Entity Integrity
 
 > primary key는 value에 NULL을 가질 수 없다.
 
-![487](https://i.imgur.com/vKNhatX.png)
+![|487](https://i.imgur.com/vKNhatX.png)
 #### 7.2.5 Referential Integrity
 
 > FK와 PK와 도메인이 같아야 하고 PK에 없는 values를 FK가 값으로 가질 수 없다.
 
-![486](https://i.imgur.com/QDyIhL2.png)
+![|486](https://i.imgur.com/QDyIhL2.png)
 - 참조 무결성 위반 시 삽입/수정/삭제가 제한된다.

@@ -12,7 +12,7 @@
 
 CPU 버스트:
 - 프로세스가 CPU에서 연속적으로 실행되는 시간
-	![371](https://i.imgur.com/YXsZDkJ.png)
+	![|371](https://i.imgur.com/YXsZDkJ.png)
 	- CPU 버스트는 대부분 8ms 이하의 짧은 시간을 가지고 있다.
 
 IO 버스트:
