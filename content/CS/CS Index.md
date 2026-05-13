@@ -11,9 +11,9 @@
 	- [[Dynamic Loading|2.2.2 Dynamic Loading]]
 		- [[Dynamic Loading-1|Dynamic Loading - 1]]
 		- [[Dynamic Loading-2|Dynamic Loading - 2]]
-	- [[정리|2.2.3 정리]]
+	- [[content/CS/시스템 보안/정리|2.2.3 정리]]
 - [[변수별 주소 공간|2.3 변수별 주소 공간]]
 - [[Segment Protection|2.4 Segment Protection]]
 ### 3. 기타
-[[Paging|3.1 Paging]]
-[[참조자(Reference)|3.2 참조자(Reference)]]
+3.1 [[Paging]]
+3.2 [[참조자(Reference)]]
